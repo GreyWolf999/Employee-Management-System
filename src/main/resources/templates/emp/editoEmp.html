@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" th:href="@{webjars/layui/2.5.4/css/layui.css}"  media="all">
+    <style>
+        .layui-form-item .layui-input-inline {
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+<form class="layui-form layui-form-pane" th:action="@{/addData2}" method="post">
+    <div class="layui-form-item">
+        <label class="layui-form-label">姓名</label>
+        <div class="layui-input-inline">
+            <input type="text" name="name" required  lay-verify="required" placeholder="请输入姓名" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">年龄</label>
+        <div class="layui-input-inline">
+            <input type="text" name="age" required lay-verify="required" placeholder="请输入年龄" autocomplete="off" class="layui-input">
+        </div>
+        <!--        <div class="layui-form-mid layui-word-aux">辅助文字</div>-->
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">手机号码</label>
+        <div class="layui-input-inline">
+            <input type="text" name="phoneNumber" required  lay-verify="required" placeholder="请输入手机号码" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">技术等级</label>
+        <div class="layui-input-inline">
+            <select name="skillLevel" lay-verify="required">
+                <option value=""></option>
+                <option value="一级">一级</option>
+                <option value="二级">二级</option>
+                <option value="三级">三级</option>
+                <option value="四级">四级</option>
+                <option value="五级">五级</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">工号</label>
+        <div class="layui-input-inline">
+            <input type="text" name="jobNumber" required  lay-verify="required" placeholder="请输入工号" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">员工等级</label>
+        <div class="layui-input-inline">
+            <select name="userLevel" lay-verify="required">
+                <option value=""></option>
+                <option value="一级">一级</option>
+                <option value="二级">二级</option>
+                <option value="三级">三级</option>
+                <option value="四级">四级</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">市级</label>
+        <div class="layui-input-inline">
+            <input type="text" name="Province" required  lay-verify="required" placeholder="请输入所在市级" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">性别：</label>
+        <div class="layui-input-block" th:width="100px">
+            <input type="radio" name="gender" value="男" title="男">
+            <input type="radio" name="gender" value="女" title="女" checked>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="addform">确认修改</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+<script th:src="@{webjars/layui/2.5.4/layui.js}" charset="utf-8"></script>
+<script>
+
+
+    layui.use('form', function() {
+        var form = layui.form;
+        //监听提交
+        form.on('submit(addform)', function(data){
+            // layer.msg(JSON.stringify(data.field));
+            // console.log(data.elem); //被执行事件的元素DOM对象，一般为button对象
+            // console.log(data.form); //被执行提交的form对象，一般在存在form标签时才会返回
+            // console.log(data.field); //当前容器的全部表单字段，名值对形式：{name: value}
+            // return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+            parent.layer.close(index);
+        });
+    });
+    alert('[${userdata}]')
+</script>
+</body>
+</html>>

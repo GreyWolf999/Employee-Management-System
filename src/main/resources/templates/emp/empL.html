@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Layui</title>
+    <link rel="stylesheet" th:href="@{webjars/layui/2.5.4/css/layui.css}"  media="all">
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+    <style>
+        .demoTable{
+            float: left;
+        }
+        .layui-btn-container{
+            float: left;
+        }
+    </style>
+</head>
+<body>
+
+<table class="layui-hide" id="table" lay-filter="test"></table>
+
+<script th:src="@{webjars/layui/2.5.4/layui.js}" charset="utf-8"></script>
+<script th:src="@{webjars/jquery/3.0.0/jquery.min.js}" charset="utf-8"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script type="text/html" id="toolbar1">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="getCheckData">获取选中行数据</button>
+        <button class="layui-btn layui-btn-sm" lay-event="getCheckLength">获取选中数目</button>
+        <button class="layui-btn layui-btn-sm" lay-event="isAll">验证是否全选</button>
+        <button class="layui-btn layui-btn-sm" lay-event="addData">
+            <i class="layui-icon">&#xe608;</i>添加数据</button>
+    </div>
+    <div class="demoTable">
+        搜索ID：
+        <div class="layui-inline">
+            <input class="layui-input" name="id" id="demoReload" autocomplete="off">
+        </div>
+        <button class="layui-btn layui-btn-sm" onclick="return false;" data-type="reload" id="selectbyCondition" >搜索</button>
+        <button class="layui-btn layui-btn-sm" lay-event="ret">返回员工列表</button>
+    </div>
+</script>
+<script type="text/html" id="bar2">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">
+        <i class="layui-icon layui-icon-delete"></i>   删除</a>
+</script>
+
+<script>
+    layui.use('table', function(){
+        var table = layui.table;
+        table.render({
+            id:'table'
+            ,elem: '#table'
+            ,url:'/empData'
+            ,toolbar: '#toolbar1' //开启头部工具栏，并为其绑定左侧模板
+            ,defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+                title: '提示'
+                ,layEvent: 'LAYTABLE_TIPS'
+                ,icon: 'layui-icon-tips'
+            }]
+            ,text: {
+                none: '数据库暂无相关数据' //默认：无数据。注：该属性为 layui 2.2.5 开始新增
+            }
+
+            ,title: '用户数据表'
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,cols: [
+                [
+                 {type: 'checkbox', fixed: 'left'}
+                 ,{field:'id', width:80, title: 'ID', sort: true}
+                ,{field:'name',  title: '姓名', sort: true, align: 'left'}
+                ,{field:'age',  title: '年龄', sort: true, align: 'left'}
+                ,{field:'gender',  title: '性别', sort: true, align: 'left'}
+                ,{field:'phoneNumber', title: '手机号码',align: 'left'}
+                ,{field:'skillLevel',  title: '技术等级', sort: true,align: 'left'}
+                ,{field:'jobNumber',  title: '工号',align: 'left'}
+                ,{field:'userLevel', title: '员工等级',sort:true,align: 'left'} //minWidth：局部定义当前单元格的最小宽度，layui 2.2.1 新增
+                ,{field:'province', title: '市级', align: 'left'}
+                    ,{fixed: 'right', title:'操作', toolbar: '#bar2', width:150}
+                ]
+            ]
+            ,page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
+                layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'] //自定义分页布局
+                //,curr: 5 //设定初始在第 5 页
+                ,groups: 5 //只显示 1 个连续页码
+                ,first: false //不显示首页
+                ,last: false //不显示尾页
+            }
+        });
+
+        //头工具栏事件
+        table.on('toolbar(test)', function(obj){
+            //obj.event 获取在toolbar中点击的按钮的layui-event的值用来匹配进行操作
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch(obj.event){
+                case 'getCheckData':
+                    var data = checkStatus.data;
+                    layer.alert(JSON.stringify(data));
+                    break;
+                case 'getCheckLength':
+                    var data = checkStatus.data;
+                    layer.msg('选中了：'+ data.length + ' 个');
+                    break;
+                case 'isAll':
+                    layer.msg(checkStatus.isAll ? '全选': '未全选');
+                    break;
+                case 'addData':
+                  layer.open({
+                       type:2
+                       ,title:'添加框'
+                       ,content:['/addData','no',]
+                       ,area: ['500px', '80%']
+                      ,shadeClose:true
+                      ,offset: 'auto'
+                      , zIndex: layer.zIndex //重点1
+                      , success: function (layero) {
+                          layer.setTop(layero); //重点2
+                      },
+                      //用来在iframe子页面关闭时刷新父页面
+                      end: function () {
+                          window.location.reload();
+                      }
+                   });
+                    break;
+                // case 'find':
+                //     var id = $("#demoReload").val();
+                //     alert(id)
+                //     // layer.msg('查询中，请稍后...',{icon:16,time:false,shade:0})
+                //     table.reload('tbale2', {
+                //         where: { //设定异步数据接口的额外参数，任意设
+                //             id: id
+                //         }
+                //         ,page: {
+                //             curr: 1 //重新从第 1 页开始
+                //         }
+                //     });
+
+                case 'ret':
+                    window.location.reload();
+                    // $.ajax({
+                    //     url:"/ListShow",
+                    //     type:"get",
+                    //     cache: false,
+                    //     success:function (datas) {
+                    //     }
+                    // })
+                    break;
+                default:
+                    break; //只重载数据
+
+
+            };
+        });
+        var dat;
+        //监听行工具事件
+        table.on('tool(test)', function(obj){
+            var data = obj.data;
+            //console.log(obj)
+            if(obj.event === 'del'){
+                layer.confirm('确定删除这行id为'+data.id+"的信息吗", function(index){
+              $.ajax({
+                  type:"DELETE",
+                  url: "/delete/"+data.id,
+                  cache: false,
+                  // data: {
+                  //     id_del:data.id
+                  // },
+                  dataType: 'json',
+                  success:function (datas) {
+                  }
+              });
+                    obj.del();
+                    layer.close(index);
+                    window.location.reload();
+
+                });
+            } else if(obj.event === 'edit'){
+                layer.open({
+                    type:2
+                    ,title:'修改框'
+                    ,content:['/edito'+data.id,'no',]
+                    ,area: ['500px', '80%']
+                    ,shadeClose:true
+                });
+            }
+        });
+//执行查询重载表格
+        var $ = layui.$, active = {
+            reload: function(){
+                //获取用户名
+                var demoReload = $('#userName');
+                var id = $("#demoReload");
+                //执行重载
+                table.reload('table', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    //根据条件查询
+                    ,where: {
+                        id:id.val()
+                    }
+                });
+            }
+        };
+        //点击搜索按钮根据用户名称查询
+        $('#selectbyCondition').on('click',
+            function(){
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+    });
+</script>
+</body>
+</html>
